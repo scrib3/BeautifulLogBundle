@@ -10,7 +10,8 @@
 
 namespace So\BeautyLogBundle\Profiler;
 
-interface CounterInterface {
+interface CounterInterface
+{
 
     /**
      * Handle the operation
@@ -34,11 +35,4 @@ interface CounterInterface {
      * @return CounterInterface
      */
     public function heapUp();
-
-    /**
-     * Map the data
-     *
-     * @return CounterInterface
-     */
-    public function map();
 }

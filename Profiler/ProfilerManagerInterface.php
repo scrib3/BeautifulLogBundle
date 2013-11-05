@@ -11,24 +11,18 @@
 namespace So\BeautyLogBundle\Profiler;
 
 
-interface ProfilerManagerInterface {
+interface ProfilerManagerInterface
+{
 
     /**
      * Load profiles
      *
-     * @param Array $engines                      Array of engines
-     * @param string $token                       The token
+     * @param Array $engines           Array of engines
+     * @param string $token            The token
      *
      * @return void
      */
-    public function loadProfiles(Array $engines, $token);
-
-    /**
-     * Initialize the counted data
-     *
-     * @return void
-     */
-    public function initializeCountedData();
+    public function loadProfiles(QueryManagerInterface $queryManager);
 
     /**
      * Get Quantitative data
@@ -66,21 +60,21 @@ interface ProfilerManagerInterface {
     public function getPanel();
 
     /**
-     * GET profiles
+     * Get profiles
      *
      * @return Array
      */
     public function getProfiles();
 
     /**
-     * GET profiler
+     * Get profiler
      *
      * @return \Symfony\Component\HttpKernel\Profiler\Profiler
      */
     public function getProfiler();
 
     /**
-     * GET counted data
+     * Get counted data
      *
      * @return Profiler
      */
