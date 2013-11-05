@@ -10,6 +10,7 @@
 
 namespace So\BeautyLogBundle\Profiler;
 
+use So\BeautyLogBundle\Profiler\Engine\EngineInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Router;
 
@@ -24,12 +25,15 @@ class QueryManager implements QueryManagerInterface
     const DEFAULT_ENGINE = 'symfony_log_engine';
 
     protected $iconSwitcherUrl;
-    protected $engine;
     protected $token;
     protected $request;
-    protected $isEngineSubmitted = false;
     protected $defaultChart;
     protected $chart;
+    protected $engineSwitcherUrl;
+    protected $engine = null;
+    protected $engineServiceId = null;
+    protected $isEngineSubmitted = false;
+    protected $isChartSubmitted = false;
 
     /**
      * Constructor
@@ -58,9 +62,9 @@ class QueryManager implements QueryManagerInterface
 
         $this->checkEngine();
 
-        $this->generateIconSwitcherUrl();
-
         $this->selectChart();
+
+        $this->generateSwitcherUrls();
     }
 
     /**
@@ -73,7 +77,35 @@ class QueryManager implements QueryManagerInterface
             $this->isEngineSubmitted = true;
         }
 
-        $this->engine = $this->request->query->get('engine', null);
+        $this->engineServiceId = $this->request->query->get('engine', null);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     */
+    public function setEngine(EngineInterface $engine)
+    {
+        $this->engine = $engine;
+    }
+
+
+    /**
+     * {@inheritdoc}
+     *
+     */
+    public function getEngineServiceId()
+    {
+        return $this->engineServiceId;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     */
+    public function hasEngine()
+    {
+        return null === $this->engine ? false : true;
     }
 
     /**
@@ -82,7 +114,14 @@ class QueryManager implements QueryManagerInterface
      */
     public function selectChart()
     {
-        $this->chart = $this->request->query->get('chart', $this->defaultChart );
+        $chart = $this->request->query->get('chart');
+
+        if(null !== $chart){
+            $this->isChartSubmitted = true;
+            $this->chart = $chart;
+        }else{
+            $this->chart = $this->defaultChart ;
+        }
     }
 
     /**
@@ -98,16 +137,20 @@ class QueryManager implements QueryManagerInterface
      * {@inheritdoc}
      *
      */
-    public function generateIconSwitcherUrl()
+    public function generateSwitcherUrls()
     {
         $currentRoute = $this->request->attributes->get('_route');
-        $this->iconSwitcherUrl = $this->router
-                                      ->generate($currentRoute, array('token' => $this->token ), true);
+        $baseUrl = $this->router
+                        ->generate($currentRoute, array('token' => $this->token ), true);
 
-        $this->iconSwitcherUrl .= "?panel=".$this->panel;
+        $this->iconSwitcherUrl = $this->engineSwitcherUrl = $baseUrl .= "?panel=".$this->panel;
 
         if($this->isEngineSubmitted){
-            $this->iconSwitcherUrl .= "&engine=".$this->engine;
+            $this->iconSwitcherUrl .= "&engine=".$this->engineServiceId;
+        }
+
+        if($this->isChartSubmitted){
+            $this->engineSwitcherUrl .= "&chart=".$this->chart;
         }
     }
 
@@ -117,7 +160,16 @@ class QueryManager implements QueryManagerInterface
      */
     public function getIconSwitcherUrl()
     {
-       return $this->iconSwitcherUrl;
+        return $this->iconSwitcherUrl;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     */
+    public function getEngineSwitcherUrl()
+    {
+        return $this->engineSwitcherUrl;
     }
 
     /**

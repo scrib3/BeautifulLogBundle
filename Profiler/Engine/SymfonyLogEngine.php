@@ -10,7 +10,7 @@
 
 namespace So\BeautyLogBundle\Profiler\Engine;
 use So\BeautyLogBundle\Profiler\Engine\Finder\FinderInterface;
-use So\BeautyLogBundle\Profiler\Engine\Finder\ParametersHandlerInterface;
+use So\BeautyLogBundle\Profiler\Parameter\ParametersHandlerInterface;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -38,11 +38,11 @@ class SymfonyLogEngine implements EngineInterface
     /**
      * Construct
      *
-     * @param Profiler $profiler              The Profiler
-     * @param FinderInterface $finder                The Finder
-     * @param ParametersHandlerInterface $parametersHandler     The Finder
-     * @param integer $dataCount             The count of data
-     * @param string $panel                 The panel
+     * @param Profiler                    $profiler              The Profiler
+     * @param FinderInterface             $finder                The Finder
+     * @param ParametersHandlerInterface  $parametersHandler     The Finder
+     * @param integer                     $dataCount             The count of data
+     * @param string                      $panel                 The panel
      *
      * @return void
      */
@@ -65,14 +65,9 @@ class SymfonyLogEngine implements EngineInterface
     {
         $this->profile = $profile;
         $this->parameters = $this->parametersHandler->getParameters($this->profile);
-        //DUMP---------------------------------
-                include_once 'debug/kint.class.php' ;
-                \kint::dump( $this->parameters) ;
-                echo "</pre>";
-                exit ;
-        //DUMP---------------------------------
 
         $this->find();
+
         $this->heapUp();
 
         return $this->profiles;
@@ -94,13 +89,13 @@ class SymfonyLogEngine implements EngineInterface
      */
     public function heapUp()
     {
+        $this->profiles = array();
+
         foreach ($this->data as $item) {
             $token = $this->accessor->getValue($item, '[token]');
             $profile = $this->profiler->loadProfile($token);
-            $this->profiles[$item["time"]]['token'] = $token;
-            $this->profiles[$item["time"]]['profile'] = $profile;
-            $this->profiles[$item["time"]]['data'] = $profile->getCollector($this->panel)->getLogs();
-            $this->profiles[$item["time"]]['name'] = $this->getName();
+
+            $this->profiles = array_merge($profile->getCollector($this->panel)->getLogs(), $this->profiles);
         }
     }
 

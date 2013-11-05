@@ -12,9 +12,10 @@ namespace So\BeautyLogBundle\Profiler;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Router;
+use So\BeautyLogBundle\Profiler\Engine\EngineInterface;
 
 /**
- * PQueryManagerInterface
+ * Query Manager Interface
  *
  * @author Sofiane HADDAG <sofiane.haddag@yahoo.fr>
  */
@@ -24,7 +25,7 @@ interface QueryManagerInterface
     /**
      * Handle the queries
      *
-     * @param \Symfony\Component\HttpFoundation\Request   $request    The request
+     * @param Request   $request    The request
      * @param string                                      $token      The token
      *
      * @return void
@@ -38,6 +39,31 @@ interface QueryManagerInterface
      * @return void
      */
     public function checkEngine();
+
+    /**
+     * Set Engine
+     *
+     * @param EngineInterface $engine  The engine
+     *
+     * @return void
+     */
+    public function setEngine(EngineInterface $engine);
+
+    /**
+     * Get the engine service
+     *
+     *
+     * @return void
+     */
+    public function getEngineServiceId();
+
+    /**
+     * Has engine
+     *
+     *
+     * @return void
+     */
+    public function hasEngine();
 
     /**
      * Selact the chart
@@ -58,7 +84,14 @@ interface QueryManagerInterface
      *
      * @return void
      */
-    public function generateIconSwitcherUrl();
+    public function generateSwitcherUrls();
+
+    /**
+     * Get the engine switcher url
+     *
+     * @return string
+     */
+    public function getEngineSwitcherUrl();
 
     /**
      * Get the icon switcher url

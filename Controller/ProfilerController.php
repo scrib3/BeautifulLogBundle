@@ -29,7 +29,8 @@ class ProfilerController extends ContainerAware
     /**
      * Renders a profiler for a logger.
      *
-     * @param string $token   The profiler token
+     * @param string  $token The profiler token
+     * @param Request $request The Request
      *
      * @return Response A Response instance
      *
@@ -42,8 +43,14 @@ class ProfilerController extends ContainerAware
 
         $queryManager = $this->container->get('beauty_log.query_manager');
         $queryManager->handleQueries($request, $token);
+        $engine = $queryManager->getEngineServiceId();
+
+        if (null !== $engine) {
+            $queryManager->setEngine($this->container->get('beauty_log.' . $engine));
+        }
 
         $this->profilerManager->loadProfiles($queryManager);
+
 
         $this->profiler = $this->profilerManager->getProfiler();
         if (null === $this->profiler) {
@@ -71,6 +78,7 @@ class ProfilerController extends ContainerAware
                     'is_ajax' => $request->isXmlHttpRequest(),
                     'counted_data' => $this->profilerManager->getCountedData(),
                     'query_manager' => $queryManager,
+                    'engine_data' => $this->profilerManager->getData(),
                 )
             ),
             200,

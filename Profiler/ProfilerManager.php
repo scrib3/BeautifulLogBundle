@@ -15,7 +15,7 @@ use Symfony\Component\HttpKernel\Profiler\Profiler;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 /**
- * Profilers manager
+ * Profiler Manager
  *
  * @author Sofiane HADDAG <sofiane.haddag@yahoo.fr>
  */
@@ -32,14 +32,14 @@ class ProfilerManager implements ProfilerManagerInterface
     protected $panel;
     protected $collector;
     protected $queryManager;
-    protected $profiles = array();
+    protected $data = array();
 
     /**
      * Constructor
      *
-     * @param CounterInterface $counter The counter
-     * @param Profiler $profiler The profiler
-     * @param string $panel The panel
+     * @param CounterInterface                                          $counter    The counter
+     * @param \Symfony\Component\HttpKernel\Profiler\Profiler\Profiler  $profiler   The profiler
+     * @param string                                                    $panel      The panel
      *
      * @return void
      */
@@ -64,39 +64,8 @@ class ProfilerManager implements ProfilerManagerInterface
 
         $this->getProfile();
 
-        $this->executeLoad();
+        $this->countData();
     }
-
-    /**
-     * Run the load
-     *
-     * @return void
-     */
-    public function executeLoad()
-    {
-
-        if (null === $this->engine) {
-            $this->countedData = $this->counter->handle($this->getCollector()->getLogs())
-                ->getCountedData();
-        }else{
-            $profile = $this->engine->loadProfiles($this->profile);
-            //$this->countedData[] = $this->counter->handle($profile['data'])->getCountedData();
-        }
-
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     */
-//    public function initializeCountedData()
-//    {
-//        if (null === $this->collector) {
-//            $this->getCollector();
-//        }
-//
-//        $this->countedData[] = $this->counter->handle($this->collector->getLogs())->getCountedData();
-//    }
 
     /**
      * {@inheritdoc}
@@ -104,11 +73,12 @@ class ProfilerManager implements ProfilerManagerInterface
      */
     public function countData()
     {
-
-
-
-        foreach ($this->profiles as $k => $profile) {
-
+        if (null === $this->engine) {
+            $this->countedData = $this->counter->handle($this->getCollector()->getLogs())
+                                               ->getCountedData();
+        }else{
+            $this->data = $this->engine->loadProfiles($this->profile);
+            $this->countedData = $this->counter->handle($this->data)->getCountedData();
         }
     }
 
@@ -143,7 +113,6 @@ class ProfilerManager implements ProfilerManagerInterface
         return $this->profile = $this->profiler->loadProfile($this->token);
     }
 
-
     /**
      * {@inheritdoc}
      *
@@ -157,9 +126,9 @@ class ProfilerManager implements ProfilerManagerInterface
      * {@inheritdoc}
      *
      */
-    public function getProfiles()
+    public function getData()
     {
-        return $this->profiles;
+        return $this->data;
     }
 
     /**
