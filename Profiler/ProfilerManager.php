@@ -78,7 +78,9 @@ class ProfilerManager implements ProfilerManagerInterface
                                                ->getCountedData();
         }else{
             $this->data = $this->engine->loadProfiles($this->profile);
-            $this->countedData = $this->counter->handle($this->data)->getCountedData();
+            
+            $this->countedData = $this->counter->handle($this->data)
+                                               ->getCountedData();
         }
     }
 
